@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs–– -->
+  <meta charset="utf-8">
+  <title>Your Project Title</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.2/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/skeleton.css">
+  <link rel="stylesheet" href="css/customize.css">
+  <style>
+  #map_1,#map_2,#map_3 {
+    height: 500px;
+  }
+  </style>
+
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+</head>
+<body>
+
+  <div class="container one-bottom" style="margin-top: 50px">
+    <div class="ten columns">
+      <h2>Connective Environments, Fall 2021</h2>
+      <p>
+        ARCH4050/6306: Tuesdays 2pm-5:15pm
+        <br>
+        Dr. Dimitris Papanikolaou | dpapanik@uncc.edu | Urban Synergetics Lab | https://urbansynergeticslab.net
+      </p>
+    </div>
+    <div class="two columns">
+      <a href="https://urbansynergeticslab.net/"><img class="scale-with-grid" src="img/LabLogo_dark_cropped.png"></a>
+    </div>
+  </div>
+
+ <div class="container one-bottom" style="margin-top: 50px">
+    <div class="twelve columns">
+      <h3>DIARY ENTRY 11.30.2021</h3>
+      <p align="justify">From last week’s class, there seemed to be a miscommunication of intent between authority and student. As explained by the lovely Dimitris Papanikolaou, he intended for us to move away from the wooden frame and continue our exploration away from the wooden frame, with concerns about the inflatable being lifted up by the expanding inflatables. From this point, we tested an inflatable with the leftover 2 mil plastic to test sizing and how the thickness of the material would hold up against people pressing up and moving through it. We don’t believe that this thickness would hold up against the wear and tear of two people attempting to push their way through a group of inflatables. Because of our shift from open space to threshold spaces, we have decided to move away from the user interface and to a motion or distance sensor. This could be connected to another part of the building, but then it’s not guaranteed that a person will ever interact with the installation when another person at activating the sensor. That might be the point, that its a special moment when the two separate events happen at just the right time, but I feel that goes against the project, it’s not about a special event happening because two people are in different spaces at the same time, it about making people experiencing the instillation feel discomfort. This is the best thing that I can think of at the moment, I am very tired, burned out, and hungry. What I think we need for the final model is 6 mil plastic, 3 ESP32, which seems like a requirement of the project from the class standpoint, 2 distance sensors, 1 relay, 1 extension cord, with at leat 3 outlets, 3 leaf blowers, flex pvd hose, command hooks, rope and grommets. Thing to consider as we start to build the digital elements of the project, how long does it take for 6 mil plastic to inflate, how fast does the average person walk, how far away does the sensor need to sense people for the inflatables to be inflated before they arrive, how to attach the air intake hose to the wall.</p>
+    </div>
+  </div>
+
+  <div class="container one-bottom">
+    <div class="row">
+      <img class="four columns scale-with-grid quarter-bottom-rel"src="img/diagrams-02.png">
+      <img class="four columns scale-with-grid quarter-bottom-rel"src="img/diagrams-01.png">
+      <img class="four columns scale-with-grid quarter-bottom-rel" src="img/diagrams-03.png">
+  </div>
+
+  <div class="container one-bottom">
+    <div class="row">
+      <img class="three columns scale-with-grid quarter-bottom-rel" src="img/20674.JPEG">
+    </div>
+  </div>
+
+
+  <script>
+
+  L.mapbox.accessToken = 'pk.eyJ1IjoiZGltcCIsImEiOiJkRnlra3RjIn0.E9CTYzNUEx0yb3dcfV4SiA';
+
+  var map_1 = L.mapbox.map('map_1')
+  .setView([40, -74.50], 9)
+  .addLayer(L.mapbox.styleLayer('mapbox://styles/dimp/citf6n01300692hmlxnnrv6wd'));
+  map_1
+  .scrollWheelZoom.disable();
+
+
+  d3.json("https://api.citybik.es/v2/networks/ford-gobike", function(data) {
+    console.log(data);
+
+    var map_2 = L.mapbox.map('map_2')
+    .setView([data.network.location.latitude, data.network.location.longitude], 10)
+    .addLayer(L.mapbox.styleLayer('mapbox://styles/dimp/citf6n01300692hmlxnnrv6wd'));
+    map_2
+    .scrollWheelZoom.disable();
+
+    data.network.stations.forEach(function(station){
+      station.lat = +station.latitude;
+      station.lng = +station.longitude;
+      var path_options = {
+        radius :  2,
+        color : d3.rgb(88,206,227).brighter(),
+        stroke: true,
+        weight : 1,
+      };
+      L.circleMarker([station.latitude, station.longitude], path_options).addTo(map_2);
+    });
+
+    var map_3 = L.mapbox.map('map_3')
+    .setView([data.network.location.latitude, data.network.location.longitude], 11)
+    .addLayer(L.mapbox.styleLayer('mapbox://styles/dimp/ck9mf0x8q3o521iojo2qmmp52'));
+    map_3
+    .scrollWheelZoom.disable();
+
+    data.network.stations.forEach(function(station){
+      station.lat = +station.latitude;
+      station.lng = +station.longitude;
+      var inventory_level = station.free_bikes / (station.free_bikes+station.empty_slots);
+      var path_options = {
+        radius :  0.14 * (station.free_bikes + station.empty_slots),
+        color : d3.rgb(88,206,227).brighter(),
+        fillColor : (function(){
+          return inventory_level > 0.5? d3.rgb(88,206,227) : d3.rgb(88,206,227).darker(2)
+        })(),
+        stroke: true,
+        weight : 1,
+        opacity : 1,
+        fillOpacity : 0.8
+      };
+      L.circleMarker([station.latitude, station.longitude], path_options).addTo(map_3);
+    });
+  });
+
+
+
+
+  </script>
+
+
+</body>
+</html>
